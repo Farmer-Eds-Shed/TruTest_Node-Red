@@ -1,1 +1,376 @@
-
+[
+    {
+        "id": "c1192b173052901b",
+        "type": "tab",
+        "label": "TruTest",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "eb18c3ad6f2f5b8b",
+        "type": "serial in",
+        "z": "c1192b173052901b",
+        "name": "",
+        "serial": "27e2b29f89680310",
+        "x": 230,
+        "y": 460,
+        "wires": [
+            [
+                "81024060e4de799a"
+            ]
+        ]
+    },
+    {
+        "id": "e7044f45d271e1af",
+        "type": "serial out",
+        "z": "c1192b173052901b",
+        "name": "",
+        "serial": "27e2b29f89680310",
+        "x": 690,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "99d8d50b13383de7",
+        "type": "debug",
+        "z": "c1192b173052901b",
+        "name": "debug 35",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 780,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "330c036c4fbad849",
+        "type": "inject",
+        "z": "c1192b173052901b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "13",
+        "payloadType": "num",
+        "x": 250,
+        "y": 280,
+        "wires": [
+            [
+                "5352f9e6ccf00987"
+            ]
+        ]
+    },
+    {
+        "id": "8a3766eacfa3a80b",
+        "type": "inject",
+        "z": "c1192b173052901b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{FN}",
+        "payloadType": "str",
+        "x": 250,
+        "y": 340,
+        "wires": [
+            [
+                "e7044f45d271e1af"
+            ]
+        ]
+    },
+    {
+        "id": "5352f9e6ccf00987",
+        "type": "function",
+        "z": "c1192b173052901b",
+        "name": "Request Session EID Reader",
+        "func": "flow.set(\"EID_Read\",[]);\nlet session = msg.payload;\nsession --;\nmsg.payload = (\n    \"{ZA1}{ZC1}\"+\n    \"{FH}{FH}{FH}{FH}{FH}\" +\n    \"{SOCU}{SLFL0}{SLFS0}{SLFT0}\" +\n    \"{SLFF0}{SLFI0}{SLFL1}{SLFS1}{SLFT1}{SLFF1}{SLFI1}\" +\n    \"{FPNA\" + session + \"}\" +\n    \"{FPNR\" + session + \"}\" +\n    \"{FF\" + session + \"}\" +\n    \"{FIF1,F0,RD,RT}\" +\n    \"{FR0}\"\n);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 480,
+        "y": 280,
+        "wires": [
+            [
+                "e7044f45d271e1af"
+            ]
+        ]
+    },
+    {
+        "id": "81024060e4de799a",
+        "type": "function",
+        "z": "c1192b173052901b",
+        "name": "Read row from EID Reader",
+        "func": "let data_save = flow.get(\"EID_Read\") || [];\nlet data = msg.payload;\n\nif (data != [\"[]\"]) {\n    if (data.includes(\",372\") || data.includes(\",969\") || data.includes(\",900\")) {\n        data = data.replace(/[\\])}[{(]/g,\"\");\n        data = data.split(',');\n        //msg.payload = data;\n    \n        data_save[data[0]] = {\n            \"EID\":data[1],\n            \"VID\":data[2],\n            \"Date\":data[3],\n            \"Time\":data[4]\n            };\n        \n        flow.set(\"EID_Read\", data_save);\n        \n        msg.payload = data_save\n        return msg;\n    }\n\n}\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 460,
+        "y": 460,
+        "wires": [
+            [
+                "99d8d50b13383de7",
+                "bbb3cb182bb732ea",
+                "2b88cacdd81f3837"
+            ]
+        ]
+    },
+    {
+        "id": "bbb3cb182bb732ea",
+        "type": "function",
+        "z": "c1192b173052901b",
+        "name": "Get Next row",
+        "func": "if (msg.payload != [\"[]\"]) {\n    msg.payload = \"{FN}\";\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 400,
+        "wires": [
+            [
+                "e7044f45d271e1af"
+            ]
+        ]
+    },
+    {
+        "id": "2b88cacdd81f3837",
+        "type": "ui_table",
+        "z": "c1192b173052901b",
+        "group": "6287d62125f6012d",
+        "name": "",
+        "order": 2,
+        "width": "12",
+        "height": "14",
+        "columns": [],
+        "outputs": 0,
+        "cts": false,
+        "x": 770,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "2b1a0eb2198dc6ea",
+        "type": "ui_button",
+        "z": "c1192b173052901b",
+        "name": "",
+        "group": "2ad8075f7461e299",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Select session",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "session",
+        "payloadType": "flow",
+        "topic": "payload",
+        "topicType": "msg",
+        "x": 140,
+        "y": 180,
+        "wires": [
+            [
+                "36ef8b2e6f75a4fd"
+            ]
+        ]
+    },
+    {
+        "id": "f445bd02f15c3731",
+        "type": "ui_button",
+        "z": "c1192b173052901b",
+        "name": "",
+        "group": "6287d62125f6012d",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Get Data",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "{FN}",
+        "payloadType": "str",
+        "topic": "payload",
+        "topicType": "msg",
+        "x": 600,
+        "y": 180,
+        "wires": [
+            [
+                "e7044f45d271e1af"
+            ]
+        ]
+    },
+    {
+        "id": "36ef8b2e6f75a4fd",
+        "type": "trigger",
+        "z": "c1192b173052901b",
+        "name": "Send twice",
+        "op1": "",
+        "op2": "",
+        "op1type": "pay",
+        "op2type": "pay",
+        "duration": "100",
+        "extend": false,
+        "overrideDelay": false,
+        "units": "ms",
+        "reset": "",
+        "bytopic": "all",
+        "topic": "topic",
+        "outputs": 1,
+        "x": 330,
+        "y": 180,
+        "wires": [
+            [
+                "5352f9e6ccf00987"
+            ]
+        ]
+    },
+    {
+        "id": "48a85e848f46869c",
+        "type": "ui_numeric",
+        "z": "c1192b173052901b",
+        "name": "",
+        "label": "Session ID",
+        "tooltip": "",
+        "group": "2ad8075f7461e299",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "wrap": false,
+        "passthru": false,
+        "topic": "payload",
+        "topicType": "msg",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "100",
+        "step": 1,
+        "className": "",
+        "x": 150,
+        "y": 100,
+        "wires": [
+            [
+                "e5172d4f2f7bd2f2"
+            ]
+        ]
+    },
+    {
+        "id": "92d6cad4afd4a0f7",
+        "type": "debug",
+        "z": "c1192b173052901b",
+        "name": "debug 36",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 540,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "e5172d4f2f7bd2f2",
+        "type": "change",
+        "z": "c1192b173052901b",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "session",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 340,
+        "y": 100,
+        "wires": [
+            [
+                "92d6cad4afd4a0f7"
+            ]
+        ]
+    },
+    {
+        "id": "27e2b29f89680310",
+        "type": "serial-port",
+        "serialport": "COM2",
+        "serialbaud": "9600",
+        "databits": "8",
+        "parity": "none",
+        "stopbits": "1",
+        "waitfor": "[",
+        "dtr": "none",
+        "rts": "none",
+        "cts": "none",
+        "dsr": "none",
+        "newline": "]",
+        "bin": "false",
+        "out": "char",
+        "addchar": "\\n",
+        "responsetimeout": "10000"
+    },
+    {
+        "id": "6287d62125f6012d",
+        "type": "ui_group",
+        "name": "Data",
+        "tab": "c1f9a33c9b3d3acc",
+        "order": 2,
+        "disp": true,
+        "width": "12",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "2ad8075f7461e299",
+        "type": "ui_group",
+        "name": "Session",
+        "tab": "c1f9a33c9b3d3acc",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "c1f9a33c9b3d3acc",
+        "type": "ui_tab",
+        "name": "Tru-Test",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]
